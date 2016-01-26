@@ -2,27 +2,22 @@ require 'oystercard'
 
 describe Oystercard do
   subject(:card){described_class.new}
-  subject(:card2){described_class.new}
   let(:start_station){double :start_station}
   let(:end_station){double :end_station}
+  let(:journey){double :journey}
 
-	it "new card balance == 0" do
-		expect(card.balance).to eq 0
-	end
+  context "balance" do
+  	it "new card balance == 0" do
+  		expect(card.balance).to eq 0
+  	end
 
-  context "changing balance" do
     it "topping up balance" do
       expect{card.top_up(10)}.to change{ card.balance}.by 10
     end
+
     it "raises error if over limit" do
     	message = "Exceeds £#{Oystercard::TOP_UP_LIMIT} top up limit."
       expect{card.top_up(Oystercard::TOP_UP_LIMIT + 1)}.to raise_error message
-    end
-  end
-
-  context "#in_journey?" do
-    before(:each) do
-      card2.top_up(Oystercard::MIN_FARE)
     end
 
     it "raises error if balance is below minimum fare" do
@@ -35,16 +30,22 @@ describe Oystercard do
     before(:each) do
       card.top_up(10)
     end
-
     it "deducts balance after touch out" do
       expect{card.touch_out(end_station)}.to change{card.balance}.by -Oystercard::MIN_FARE
     end
-
+    it "ends the journey" do
+      expect(card.journey).to receive(:end)
+      card.touch_out(end_station)
+    end
   end
 
   context "start of journey" do
     before(:each) do
       card.top_up(10)
+    end
+    it "starts the journey" do
+      expect(card.journey).to receive(:start)
+      card.touch_in(start_station)
     end
   end
 end
