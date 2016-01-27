@@ -16,12 +16,12 @@ describe Journey do
 
   describe '#in_journey?' do
     it 'checks that when initialised the card is not in journey' do
-      expect(subject).to_not be_in_journey
+      expect(journey).to_not be_in_journey
     end
 
     it 'checks that when the journey has started, the card is in journey' do
       journey.start(entry_station)
-      expect(subject).to be_in_journey
+      expect(journey).to be_in_journey
     end
   end
 
@@ -43,6 +43,14 @@ describe Journey do
       journey.start(entry_station)
       journey.end(exit_station)
       expect(journey.journey_list).to include(entry_station => exit_station)
+    end
+  end
+
+  describe '#journey_complete' do
+    it 'checks that a journey is complete' do
+      journey.start(entry_station)
+      journey.end(exit_station)
+      expect(journey).to be_complete
     end
   end
 
