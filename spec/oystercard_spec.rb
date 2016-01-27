@@ -4,7 +4,7 @@ describe Oystercard do
   subject(:oystercard) {described_class.new(journey)}
   let(:entry_station) {double (:entry_station)}
   let(:exit_station) {double (:exit_station)}
-  let(:journey) { double(:journey, :start => nil, :end => nil, :in_journey? => true, :complete? => true) }
+  let(:journey) { double(:journey, :start => nil, :end => nil, :in_journey? => true, :complete? => true, :reset => nil) }
 
   describe "#balance" do
     it "is initialised with a balance of 0 by default" do
@@ -77,6 +77,30 @@ describe Oystercard do
       oystercard.touch_in(entry_station)
       oystercard.touch_out(exit_station)
       expect(oystercard.fare).to eq Oystercard::FARE_MIN
+    end
+
+    it 'returns the penalty fare when a journey is incomplete' do
+      allow(journey).to receive(:complete?).and_return false
+      oystercard.top_up(10)
+      oystercard.touch_in(entry_station)
+      expect(oystercard.fare).to eq Oystercard::PENALTY_FARE
+    end
+  end
+
+  describe '#double_touch_in' do
+    it 'deducts Penalty charge on double touch in' do
+      allow(journey).to receive(:complete?).and_return false
+      oystercard.top_up(10)
+      oystercard.touch_in(entry_station)
+      expect{oystercard.touch_in(entry_station)}.to change{ oystercard.balance }.by -Oystercard::PENALTY_FARE
+    end
+
+    it 'deducts penalty charge on double touch out' do
+      allow(journey).to receive(:complete?).and_return false
+      oystercard.top_up(10)
+      oystercard.touch_in(entry_station)
+      oystercard.touch_out(exit_station)
+      expect{oystercard.touch_out(exit_station)}.to change{ oystercard.balance }.by -Oystercard::PENALTY_FARE
     end
   end
 

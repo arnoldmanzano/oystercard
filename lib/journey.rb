@@ -28,4 +28,9 @@ end
     !!@entry_station && !!@exit_station
   end
 
+  def reset
+    @entry_station = nil
+    @exit_station = nil
+  end
+
 end
