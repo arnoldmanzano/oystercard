@@ -1,9 +1,10 @@
 require 'oystercard'
 
 describe Oystercard do
-  subject(:oystercard) {described_class.new}
+  subject(:oystercard) {described_class.new(journey)}
   let(:entry_station) {double (:entry_station)}
   let(:exit_station) {double (:exit_station)}
+  let(:journey) { double(:journey, :start => nil, :end => nil, :in_journey? => true, :complete? => true) }
 
   describe "#balance" do
     it "is initialised with a balance of 0 by default" do
@@ -22,7 +23,7 @@ describe Oystercard do
     it 'raises an error if topping up more than the max limit' do
       max_balance = Oystercard::BALANCE_MAX
       oystercard.top_up(max_balance)
-      expect{ oystercard.top_up(1) }.to raise_error 'Top-up exceeds maximum limit of #{max_balance}'
+      expect{ oystercard.top_up(1) }.to raise_error "Top-up exceeds maximum limit of #{max_balance}"
     end
   end
 
@@ -38,13 +39,13 @@ describe Oystercard do
     end
 
     it 'starts journey when card is touched in (Manzano style)' do
-      expect(oystercard.journey).to receive(:start)
+      expect(journey).to receive(:start)
       oystercard.touch_in(entry_station)
     end
 
     it 'is in in_journey when the card is touched in' do
       oystercard.touch_in(entry_station)
-      expect(oystercard.journey).to be_in_journey
+      expect(journey).to be_in_journey
     end
   end
 
@@ -60,13 +61,13 @@ describe Oystercard do
     end
 
     it 'ends journey when card is touched out (Manzano style)' do
-      expect(oystercard.journey).to receive(:end)
+      expect(journey).to receive(:end)
       oystercard.touch_out(exit_station)
     end
 
     it 'is in not in_journey when the card is touched out' do
       oystercard.touch_out(exit_station)
-      expect(oystercard.journey).to be_complete
+      expect(journey).to be_complete
     end
   end
 

@@ -7,14 +7,14 @@ class Oystercard
   BALANCE_MAX = 90
   FARE_MIN = 1
 
-  def initialize
+  def initialize(journey = Journey.new)
     @balance = 0
-    @journey = Journey.new
+    @journey = journey
   end
 
   def top_up(value)
     max_balance = BALANCE_MAX
-    raise 'Top-up exceeds maximum limit of #{max_balance}' if @balance + value > BALANCE_MAX
+    raise "Top-up exceeds maximum limit of #{max_balance}" if @balance + value > BALANCE_MAX
     @balance += value
   end
 
