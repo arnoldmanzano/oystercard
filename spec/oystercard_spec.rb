@@ -38,36 +38,36 @@ describe Oystercard do
     end
   end
 
-  describe '#entry_station' do
-    it 'remembers the entry station after touch in' do
-      oystercard.top_up(Oystercard::FARE_MIN)
-      oystercard.touch_in(entry_station)
-      expect(oystercard.entry_station).to eq entry_station
-    end
-  end
-
-  # describe '#exit_station' do
-  #   it 'forgets the entry station after touch out' do
+  # describe '#entry_station' do
+  #   it 'remembers the entry station after touch in' do
+  #     oystercard.top_up(Oystercard::FARE_MIN)
+  #     oystercard.touch_in(entry_station)
+  #     expect(oystercard.entry_station).to eq entry_station
+  #   end
+  # end
+  #
+  # # describe '#exit_station' do
+  # #   it 'forgets the entry station after touch out' do
+  # #     oystercard.top_up(Oystercard::FARE_MIN)
+  # #     oystercard.touch_in(entry_station)
+  # #     oystercard.touch_out(exit_station)
+  # #     expect(oystercard.entry_station).to eq nil
+  # #   end
+  # # end
+  #
+  # describe '#journey_list' do
+  #   it 'checks that the journey list is empty by default' do
+  #     expect(oystercard.journey_list).to be {}
+  #   end
+  # end
+  #
+  # describe '#journey_list' do
+  #   it 'checks that touching in and out creates a journey' do
   #     oystercard.top_up(Oystercard::FARE_MIN)
   #     oystercard.touch_in(entry_station)
   #     oystercard.touch_out(exit_station)
-  #     expect(oystercard.entry_station).to eq nil
+  #     expect(oystercard.journey_list).to include(entry_station => exit_station)
   #   end
   # end
-
-  describe '#journey_list' do
-    it 'checks that the journey list is empty by default' do
-      expect(oystercard.journey_list).to be {}
-    end
-  end
-
-  describe '#journey_list' do
-    it 'checks that touching in and out creates a journey' do
-      oystercard.top_up(Oystercard::FARE_MIN)
-      oystercard.touch_in(entry_station)
-      oystercard.touch_out(exit_station)
-      expect(oystercard.journey_list).to include(entry_station => exit_station)
-    end
-  end
 
 end
