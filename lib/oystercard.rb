@@ -10,7 +10,7 @@ class Oystercard
   def initialize
     @balance = 0
     @history = []
-    @journey = Hash.new
+    @journey = {:entry_station => nil, :exit_station => nil}
   end
 
   def top_up amount
@@ -24,16 +24,15 @@ class Oystercard
 
   def touch_in(station)
     fail "Insufficient funds" if balance < MINIMUM_BALANCE
+    @journey = {:entry_station => station, :exit_station => nil}
     @entry_station = true
-    @journey[:entry_station] = station
-    
+    @history << @journey
   end
 
   def touch_out(station)
     @entry_station = nil
     deduct MINIMUM_CHARGE
     @journey[:exit_station] = station
-    @history << @journey
   end
 
   private
