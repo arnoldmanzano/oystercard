@@ -1,28 +1,49 @@
+
 require 'journey'
+
 describe Journey do
-subject(:journey) {described_class.new}
+
+  subject(:journey) {described_class.new}
   let (:entry_station) {double(:entry_station)}
   let (:exit_station) {double(:exit_station)}
-describe '#start_journey' do
+  let (:oystercard) {double(:oystercard, :balance => 10)}
 
+  describe '#start_journey' do
 
     it 'starts a journey' do
-        subject.start_journey(entry_station)
-        expect(subject.journey_details).to include(:entry_station => entry_station, :exit_station=> nil)
-      end
+      subject.start_journey(entry_station)
+      expect(subject.journey_details).to include(:entry_station => entry_station, :exit_station=> nil)
     end
 
-    describe '#end_journey' do
+  end
 
+  describe '#end_journey' do
 
-        it 'ends a journey' do
-            subject.start_journey(entry_station)
-            subject.end_journey(exit_station)
-            expect(subject.journey_details).to include(:entry_station => entry_station, :exit_station=> exit_station)
-          end
-        end
+    it 'ends a journey' do
+      subject.start_journey(entry_station)
+      subject.end_journey(exit_station)
+      expect(subject.journey_details).to include(:entry_station => entry_station, :exit_station=> exit_station)
+    end
 
+  end
 
+  describe '#fare' do
 
+    it {should respond_to(:fare)}
+
+    it 'should return the minimum fare' do
+      minimum_fare = Journey::MINIMUM_FARE
+      subject.start_journey(entry_station)
+      subject.end_journey(exit_station)
+      expect(subject.fare).to eq minimum_fare
+    end
+
+    it 'should return the maximum fare' do
+      maximum_fare = Journey::MAXIMUM_FARE
+      subject.end_journey(exit_station)
+      expect(subject.fare).to eq maximum_fare
+    end
+
+  end
 
 end
