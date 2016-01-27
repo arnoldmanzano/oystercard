@@ -27,4 +27,10 @@ class Journey
     !@entry_station.nil? && !@exit_station.nil?
   end
 
+  def reset_journey
+    @entry_station = nil
+    @exit_station = nil
+    @journey_details = {:entry_station => nil, :exit_station => nil}
+  end
+
 end
