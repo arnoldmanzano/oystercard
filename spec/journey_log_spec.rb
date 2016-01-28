@@ -12,6 +12,7 @@ describe JourneyLog do
     allow(journey_klass).to receive(:new){journey}
     allow(journey).to receive(:start_journey){:entry_station}
     allow(journey).to receive(:end_journey){:exit_station}
+    allow(journey).to receive(:fare)
     #journey_log (journey_klass)
   end
 
@@ -52,6 +53,7 @@ describe JourneyLog do
       subject.exit_journey(exit_station)
     end
   end
+
  describe '#journeys' do
     it 'stores a journey' do
      subject.start_journey(entry_station)
@@ -69,6 +71,14 @@ describe JourneyLog do
       subject.exit_journey(exit_station)
       subject.start_journey(entry_station)
       expect(subject.history.length).not_to be 2
+    end
+  end
+
+  describe '#fare' do
+    it 'returns the fare of an incomplete journey' do
+      subject.start_journey(entry_station)
+      expect(journey).to receive(:fare)
+      subject.outstanding_charges
     end
 
   end

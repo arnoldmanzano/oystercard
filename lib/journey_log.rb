@@ -12,6 +12,7 @@ class JourneyLog
 
   def start_journey(entry_station)
     history << @journey if @journey
+    #outstanding_charges if @journey
     @journey = journey_klass.new
     @journey.start_journey(entry_station)
   end
@@ -27,12 +28,15 @@ class JourneyLog
     @journey = nil
   end
 
+  def outstanding_charges
+    @journey.fare
+  end
 
   def journeys
     @history.dup
   end
 
-   private
+  private
   def current_journey
     @journey ||= journey_klass.new
   end
