@@ -1,14 +1,17 @@
-require 'journey'
+require_relative 'journey'
+require_relative 'station'
+
 class JourneyLog
 
-  attr_reader :journey_klass, :log
+  attr_reader :journey_klass, :history
 
   def initialize(journey_klass=Journey)
     @journey_klass = journey_klass
-    @log = []
+    @history = []
   end
 
   def start_journey(entry_station)
+    history << @journey if @journey
     @journey = journey_klass.new
     @journey.start_journey(entry_station)
   end
@@ -20,11 +23,20 @@ class JourneyLog
   def exit_journey(exit_station)
     @journey = current_journey
     @journey.end_journey(exit_station)
+    @history << @journey
+    @journey = nil
   end
 
-  private
+
+  def journeys
+    @history.dup
+  end
+
+   private
   def current_journey
     @journey ||= journey_klass.new
   end
+
+
 
 end
