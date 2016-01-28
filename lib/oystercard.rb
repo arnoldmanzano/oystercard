@@ -33,8 +33,10 @@ class Oystercard
       @journey = Journey.new
       @journey.end_journey exit_station
       @history << @journey.journey_details
+      deduct Journey::MAXIMUM_FARE
     else
       @journey.end_journey exit_station
+      deduct Journey::MINIMUM_FARE
     end
       @journey.reset_journey
   end
