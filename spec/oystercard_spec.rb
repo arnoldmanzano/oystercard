@@ -10,8 +10,6 @@ describe Oystercard do
 
   describe '#initialize' do
 
-    it { is_expected. to respond_to{:balance}}
-
     it 'initializes with 0 balance and an empty history' do
       expect(oystercard.balance).to eq 0
       expect(oystercard.history).to be_empty
@@ -20,8 +18,6 @@ describe Oystercard do
   end
 
   describe '#top up' do
-
-    it {is_expected.to respond_to(:top_up).with(1).argument }
 
     it 'can be topped up' do
       expect{ oystercard.top_up 1 }.to change{ oystercard.balance }.by 1
