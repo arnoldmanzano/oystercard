@@ -51,7 +51,14 @@ describe Oystercard do
 
   describe '#touch in' do
 
-    it { is_expected.to respond_to(:touch_in).with(1).argument }
+    it 'deducts a maximum fare after double touch_in' do
+      oystercard.top_up 10
+      subject.touch_in(entry_station)
+      expect{subject.touch_in(entry_station)}.to change{subject.balance}.by -(Journey::MAXIMUM_FARE)
+    end
+
+
+
 
     it 'raises an error if balance is less than 1' do
       expect{oystercard.touch_in(entry_station)}.to raise_error "Insufficient funds"
@@ -72,7 +79,6 @@ describe Oystercard do
       oystercard.touch_in(entry_station)
     end
 
-    it { is_expected.to respond_to(:touch_out).with(1).argument }
 
     it 'lets you touch out' do
       oystercard.touch_out(exit_station)
