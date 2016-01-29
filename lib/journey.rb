@@ -27,4 +27,8 @@ class Journey
     @entry_station && @exit_station
   end
 
+  def in_progress?
+    @entry_station && !@exit_station
+  end
+
 end

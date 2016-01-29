@@ -19,17 +19,32 @@ class Oystercard
     @balance += amount
   end
 
+  # def touch_in(entry_station)
+  #   fail "Insufficient funds" if balance < MINIMUM_FARE
+  #   deduct(@journey_log.fare) if @journey_log.in_progress?
+  #   @journey_log.start_journey(entry_station)
+  # end
+  #
+  # def touch_out(exit_station)
+  #   @journey_log.exit_journey(exit_station)
+  #   deduct(@journey_log.fare)
+  #   # @journey_log.reset
+  # end
+
   def touch_in(entry_station)
     fail "Insufficient funds" if balance < MINIMUM_FARE
-    deduct(@journey_log.fare) if @journey_log.journey
+    touch_out(nil) if @journey_log.in_progress?
     @journey_log.start_journey(entry_station)
   end
 
   def touch_out(exit_station)
+    touch_in(nil) unless @journey_log.in_progress?
     @journey_log.exit_journey(exit_station)
     deduct(@journey_log.fare)
-    @journey_log.reset
   end
+
+#TODO write a separate method to check minimum balance
+
 
   private
   def deduct(amount)
