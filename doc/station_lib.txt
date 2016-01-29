@@ -1,0 +1,7 @@
+Old-street, 2
+Liverpool-st, 2
+Tottenham-court-road, 1
+Oxford-street, 1
+Angel, 2
+Brixton, 4
+Wembley, 5
