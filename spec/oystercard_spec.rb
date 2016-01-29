@@ -30,6 +30,7 @@ describe Oystercard do
   describe '#deduct method' do
 
     it 'deduct' do
+      allow(journey_log).to receive(:in_progress?){false}
       allow(journey_log).to receive(:fare){Oystercard::MINIMUM_FARE}
       oystercard.top_up 50
       oystercard.touch_in(entry_station)
@@ -41,8 +42,10 @@ describe Oystercard do
 
     it 'deducts a maximum fare after double touch_in' do
       allow(journey_log).to receive(:fare){Journey::PENALTY_FARE}
+      allow(journey_log).to receive(:in_progress?){false}
       oystercard.top_up 10
       subject.touch_in(entry_station)
+      allow(journey_log).to receive(:in_progress?){true}
       expect{subject.touch_in(entry_station)}.to change{subject.balance}.by -(Journey::PENALTY_FARE)
     end
 
@@ -52,6 +55,7 @@ describe Oystercard do
 
     it 'calls the start_journey on journey_log' do
       oystercard.top_up 10
+      allow(journey_log).to receive(:in_progress?){false}
       expect(journey_log).to receive(:start_journey)
       oystercard.touch_in(entry_station)
     end
@@ -63,6 +67,7 @@ describe Oystercard do
   describe '#touch_out' do
     before do
       oystercard.top_up 10
+      allow(journey_log).to receive(:in_progress?){false}
       oystercard.touch_in(entry_station)
     end
 
