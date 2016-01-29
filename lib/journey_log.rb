@@ -4,7 +4,7 @@ require 'forwardable'
 
 class JourneyLog
 
-  attr_reader :journey_klass, :journeys, :journey
+  attr_reader :journey_klass, :journey
 
   extend Forwardable
   delegate [:fare, :in_progress?] => :@journey
