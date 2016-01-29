@@ -8,8 +8,6 @@ describe Oystercard do
   let(:entry_station){ double(:station) }
   let(:exit_station){ double(:station) }
 
-
-
   describe '#initialize' do
 
     it 'initializes with 0 balance' do
@@ -58,12 +56,8 @@ describe Oystercard do
       oystercard.touch_in(entry_station)
     end
 
-    # it 'starts a journey' do
-    #   oystercard.top_up 10
-    #   subject.touch_in(entry_station)
-    #   expect(subject.history).to include({:entry_station=> entry_station, :exit_station=> nil})
+    # it '' do
     # end
-
   end
 
   describe '#touch_out' do
@@ -77,16 +71,6 @@ describe Oystercard do
       oystercard.touch_out(exit_station)
     end
 
-    # it 'forgets the entry station' do
-    #   oystercard.touch_out(exit_station)
-    #   expect(oystercard.entry_station).to eq nil
-    # end
-
-    # it 'stores a journey' do
-    #   subject.touch_in(entry_station)
-    #   oystercard.touch_out(exit_station)
-    #   expect(oystercard.history).to include({:entry_station=> entry_station, :exit_station=> exit_station})
-    # end
   end
 
 end

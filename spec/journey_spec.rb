@@ -14,7 +14,6 @@ describe Journey do
       subject.start_journey(entry_station)
       expect(subject.journey_details).to include(:entry_station => entry_station, :exit_station=> nil)
     end
-
   end
 
   describe '#end_journey' do
@@ -24,7 +23,6 @@ describe Journey do
       subject.end_journey(exit_station)
       expect(subject.journey_details).to include(:entry_station => entry_station, :exit_station=> exit_station)
     end
-
   end
 
   describe '#fare' do
@@ -43,7 +41,5 @@ describe Journey do
       subject.end_journey(exit_station)
       expect(subject.fare).to eq penalty_fare
     end
-
   end
-
 end

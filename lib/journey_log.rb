@@ -1,22 +1,24 @@
 require_relative 'journey'
 require_relative 'station'
+require 'forwardable'
 
 class JourneyLog
 
-  attr_reader :journey_klass, :journeys
+  attr_reader :journey_klass, :journeys, :journey
 
-  def initialize(journey_klass=Journey)
+  extend Forwardable
+  delegate :fare => :@journey
+
+  def initialize(journey_klass: Journey)
     @journey_klass = journey_klass
     @history = []
   end
 
   def start_journey(entry_station)
-    @history << @journey if @journey
-    #outstanding_charges if @journey
+    exit_journey(nil) if @journey
     @journey = journey_klass.new
     @journey.start_journey(entry_station)
   end
-
 
   def journey_status
     current_journey
@@ -26,11 +28,11 @@ class JourneyLog
     @journey = current_journey
     @journey.end_journey(exit_station)
     @history << @journey if @journey
-    @journey = nil
+    # @journey = nil
   end
 
-  def outstanding_charges
-    @journey.fare
+  def reset
+    @journey = nil
   end
 
   def journeys
