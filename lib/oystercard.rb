@@ -33,7 +33,7 @@ class Oystercard
   end
 
   def touch_out(exit_station)
-      (@journey ||= Journey.new). end_journey exit_station
+      (@journey ||= Journey.new).end_journey exit_station
       @history << @journey.journey_details
       deduct(@journey.fare)
   end

@@ -1,7 +1,7 @@
 require 'journey_log'
 
 describe JourneyLog do
-  let(:journey_klass) { double('journey_klass') }
+  let(:journey_klass) { double('journey_klass', new: journey) }
 
   subject(:journey_log) { described_class.new(journey_klass) }
   let(:journey){ double(:journey) }
@@ -9,7 +9,6 @@ describe JourneyLog do
   let(:exit_station){ double(:station) }
 
   before do
-    allow(journey_klass).to receive(:new){journey}
     allow(journey).to receive(:start_journey){:entry_station}
     allow(journey).to receive(:end_journey){:exit_station}
     allow(journey).to receive(:fare)

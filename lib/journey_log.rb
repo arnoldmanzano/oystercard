@@ -11,15 +11,12 @@ class JourneyLog
   end
 
   def start_journey(entry_station)
-    create_record
+    @history << @journey if @journey
     #outstanding_charges if @journey
     @journey = journey_klass.new
     @journey.start_journey(entry_station)
   end
 
-  def create_record
-    @history << @journey if @journey
-  end
 
   def journey_status
     current_journey
@@ -28,7 +25,7 @@ class JourneyLog
   def exit_journey(exit_station)
     @journey = current_journey
     @journey.end_journey(exit_station)
-    create_record
+    @history << @journey if @journey
     @journey = nil
   end
 
@@ -42,7 +39,7 @@ class JourneyLog
 
   private
   def current_journey
-    @journey ||= journey_klass.new
+    @journey || journey_klass.new
   end
 
 end
