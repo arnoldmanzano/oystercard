@@ -1,5 +1,6 @@
 class Journey
 
+
   MINIMUM_FARE = 1
   MAXIMUM_FARE = 6
 

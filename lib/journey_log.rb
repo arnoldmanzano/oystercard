@@ -3,7 +3,7 @@ require_relative 'station'
 
 class JourneyLog
 
-  attr_reader :journey_klass, :history
+  attr_reader :journey_klass, :journeys
 
   def initialize(journey_klass=Journey)
     @journey_klass = journey_klass
@@ -11,10 +11,14 @@ class JourneyLog
   end
 
   def start_journey(entry_station)
-    history << @journey if @journey
+    create_record
     #outstanding_charges if @journey
     @journey = journey_klass.new
     @journey.start_journey(entry_station)
+  end
+
+  def create_record
+    @history << @journey if @journey
   end
 
   def journey_status
@@ -24,7 +28,7 @@ class JourneyLog
   def exit_journey(exit_station)
     @journey = current_journey
     @journey.end_journey(exit_station)
-    @history << @journey
+    create_record
     @journey = nil
   end
 
@@ -40,7 +44,5 @@ class JourneyLog
   def current_journey
     @journey ||= journey_klass.new
   end
-
-
 
 end
