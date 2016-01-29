@@ -2,7 +2,7 @@ class Journey
 
 
   MINIMUM_FARE = 1
-  MAXIMUM_FARE = 6
+  PENALTY_FARE = 6
 
   attr_reader :journey_details, :entry_station, :exit_station
 
@@ -21,7 +21,7 @@ class Journey
   end
 
   def fare
-    complete? ? MINIMUM_FARE : MAXIMUM_FARE
+    complete? ? MINIMUM_FARE : PENALTY_FARE
   end
 
   def complete?

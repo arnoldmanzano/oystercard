@@ -38,10 +38,10 @@ describe Journey do
       expect(subject.fare).to eq minimum_fare
     end
 
-    it 'should return the maximum fare' do
-      maximum_fare = Journey::MAXIMUM_FARE
+    it 'should return the PENALTY fare' do
+      penalty_fare = Journey::PENALTY_FARE
       subject.end_journey(exit_station)
-      expect(subject.fare).to eq maximum_fare
+      expect(subject.fare).to eq penalty_fare
     end
 
   end

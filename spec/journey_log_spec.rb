@@ -18,7 +18,7 @@ describe JourneyLog do
   describe '#initialize' do
     it 'journey_log is empty when created' do
 
-      expect(subject.history).to be_empty
+      expect(subject.journeys).to be_empty
     end
   end
 
@@ -57,19 +57,19 @@ describe JourneyLog do
     it 'stores a journey' do
      subject.start_journey(entry_station)
      subject.exit_journey(exit_station)
-     expect(subject.history).to include(journey)
+     expect(subject.journeys).to include(journey)
     end
     it 'stores an incomplete journey' do
       subject.start_journey(entry_station)
       subject.start_journey(entry_station)
-      expect(subject.history).to include(journey)
+      expect(subject.journeys).to include(journey)
     end
 
     it 'stores does not store an incomplete journey before it is ended' do
       subject.start_journey(entry_station)
       subject.exit_journey(exit_station)
       subject.start_journey(entry_station)
-      expect(subject.history.length).not_to be 2
+      expect(subject.journeys.length).not_to be 2
     end
   end
 
