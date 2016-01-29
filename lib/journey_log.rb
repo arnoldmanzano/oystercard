@@ -16,13 +16,11 @@ class JourneyLog
   end
 
   def start_journey(entry_station)
-    # exit_journey(nil) if @journey.in_progress?
     @journey = journey_klass.new
     @journey.start_journey(entry_station)
   end
 
   def exit_journey(exit_station)
-    # start_journey(nil) unless @journey.in_progress?
     @journey.end_journey(exit_station)
     @history << @journey
   end
