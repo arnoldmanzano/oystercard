@@ -1,38 +1,57 @@
-require "journey"
+require 'journey'
+require 'oystercard'
 
 describe Journey do
+
   subject(:journey) {described_class.new}
-  let(:start_station){double :start_station}
-  let(:end_station){double :end_station}
+  let(:entry_station) {double (:entry_station)}
+  let(:exit_station) {double (:exit_station)}
 
-  context "#trip" do
-    it "starts with empty history" do
-      expect(journey.history).to be_empty
-    end
-
-    it "is in journey after start trip" do
-      journey.start(start_station)
-      expect(journey).to be_started
-    end
-
-    it "ends journey after end station" do
-      journey.start(start_station)
-      journey.end(end_station)
-      expect(journey).to be_ended
-    end
-
-    it "records journey in hash" do
-      journey.start(start_station)
-      journey.end(end_station)
-      expect(journey.history).to include(start: start_station, end: end_station)
-    end
-
-    it "record history array upon end trip" do
-      journey.start(start_station)
-      journey.end(end_station)
-      expect(journey.history).to include journey.trip
+  describe '#entry_station' do
+    it 'remembers the entry station after journey started' do
+      journey.start(entry_station)
+      expect(journey.entry_station).to eq entry_station
     end
   end
-end
 
-#TODO fare method
+  describe '#in_journey?' do
+    it 'checks that when initialised the card is not in journey' do
+      expect(journey).to_not be_in_journey
+    end
+
+    it 'checks that when the journey has started, the card is in journey' do
+      journey.start(entry_station)
+      expect(journey).to be_in_journey
+    end
+  end
+
+    describe '#exit_station' do
+      it 'remembers the exit station after journey ended' do
+        journey.end(exit_station)
+        expect(journey.exit_station).to eq exit_station
+      end
+    end
+
+  describe '#journey_list' do
+    it 'checks that the journey list is empty by default' do
+      expect(journey.journey_list).to be {}
+    end
+  end
+
+  describe '#journey_list' do
+    it 'checks that touching in and out creates a journey' do
+      journey.start(entry_station)
+      journey.end(exit_station)
+      expect(journey.journey_list).to include(entry_station => exit_station)
+    end
+  end
+
+  describe '#journey_complete' do
+    it 'checks that a journey is complete' do
+      journey.start(entry_station)
+      journey.end(exit_station)
+      expect(journey).to be_complete
+    end
+  end
+
+end

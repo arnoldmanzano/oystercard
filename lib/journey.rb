@@ -1,25 +1,36 @@
+require_relative 'station'
+require_relative 'oystercard'
+
 class Journey
-  attr_reader :history, :trip
 
-  def initialize
-    @trip = {start: nil, end: nil}
-    @history = []
+attr_reader :entry_station, :exit_station, :journey_list
+
+def initialize
+  @entry_station = nil
+  @exit_station = nil
+  @journey_list = {}
+end
+
+  def in_journey?
+    !!@entry_station
   end
 
-  def start(station)
-    @trip[:start] = station
+  def start(entry_station)
+    @entry_station = entry_station
   end
 
-  def end(station)
-    @trip[:end] = station
-		@history << @trip
+  def end(exit_station)
+    @journey_list[@entry_station] = exit_station
+    @exit_station = exit_station
   end
 
-  def started?
-  !!@trip[:start]
+  def complete?
+    !!@entry_station && !!@exit_station
   end
 
-  def ended?
-  !!@trip[:end]
+  def reset
+    @entry_station = nil
+    @exit_station = nil
   end
+
 end

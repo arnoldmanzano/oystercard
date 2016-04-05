@@ -1,102 +1,107 @@
 require 'oystercard'
 
 describe Oystercard do
-  subject(:card){described_class.new}
-  let(:start_station){double :start_station}
-  let(:end_station){double :end_station}
-  let(:journey){double :journey}
+  subject(:oystercard) {described_class.new(journey)}
+  let(:entry_station) {double (:entry_station)}
+  let(:exit_station) {double (:exit_station)}
+  let(:journey) { double(:journey, :start => nil, :end => nil, :in_journey? => true, :complete? => true, :reset => nil) }
 
-  context "balance" do
-  	it "new card balance == 0" do
-  		expect(card.balance).to eq 0
-  	end
-
-    it "topping up balance" do
-      expect{card.top_up(10)}.to change{ card.balance}.by 10
-    end
-
-    it "raises error if over limit" do
-    	message = "Exceeds £#{Oystercard::TOP_UP_LIMIT} top up limit."
-      expect{card.top_up(Oystercard::TOP_UP_LIMIT + 1)}.to raise_error message
-    end
-
-    it "raises error if balance is below minimum fare" do
-      message = "Balance is below £#{Oystercard::MIN_FARE} minimum"
-      expect { (card.touch_in(start_station)) }.to raise_error message
+  describe "#balance" do
+    it "is initialised with a balance of 0 by default" do
+      expect(oystercard.balance).to eq 0
     end
   end
 
-  context "end of journey" do
+  describe '#top_up' do
+    it 'adds the value specified to the balance' do
+      value = rand(Oystercard::BALANCE_MAX)
+      expect{oystercard.top_up(value)}.to change{ oystercard.balance }.from(0).to(value)
+    end
+  end
+
+  describe '#top_up' do
+    it 'raises an error if topping up more than the max limit' do
+      max_balance = Oystercard::BALANCE_MAX
+      oystercard.top_up(max_balance)
+      expect{ oystercard.top_up(1) }.to raise_error "Top-up exceeds maximum limit of #{max_balance}"
+    end
+  end
+
+  describe '#inferior_balance' do
+    it 'raises an exception if the balance is inferior to £1' do
+      expect{ oystercard.touch_in(entry_station) }.to raise_error 'Please top up your card.'
+    end
+  end
+
+  describe '#touch_in(station)' do
     before(:each) do
-      card.top_up(10)
+      oystercard.top_up(10)
     end
-    it "deducts balance after touch out" do
-      expect{card.touch_out(end_station)}.to change{card.balance}.by -Oystercard::MIN_FARE
+
+    it 'starts journey when card is touched in (Manzano style)' do
+      expect(journey).to receive(:start)
+      oystercard.touch_in(entry_station)
     end
-    it "ends the journey" do
-      expect(card.journey).to receive(:end)
-      card.touch_out(end_station)
+
+    it 'is in in_journey when the card is touched in' do
+      oystercard.touch_in(entry_station)
+      expect(journey).to be_in_journey
     end
   end
 
-  context "start of journey" do
+  describe '#touch_out' do
+
     before(:each) do
-      card.top_up(10)
+      oystercard.top_up(10)
+      oystercard.touch_in(entry_station)
     end
-    it "starts the journey" do
-      expect(card.journey).to receive(:start)
-      card.touch_in(start_station)
+
+    it 'reduces the balance by the minimum fare' do
+      expect{oystercard.touch_out(exit_station)}.to change { oystercard.balance }.by -Oystercard::FARE_MIN
+    end
+
+    it 'ends journey when card is touched out (Manzano style)' do
+      expect(journey).to receive(:end)
+      oystercard.touch_out(exit_station)
+    end
+
+    it 'is in not in_journey when the card is touched out' do
+      oystercard.touch_out(exit_station)
+      expect(journey).to be_complete
     end
   end
+
+  describe '#fare' do
+    it 'returns the minimum fare when a journey is complete' do
+      oystercard.top_up(10)
+      oystercard.touch_in(entry_station)
+      oystercard.touch_out(exit_station)
+      expect(oystercard.fare).to eq Oystercard::FARE_MIN
+    end
+
+    it 'returns the penalty fare when a journey is incomplete' do
+      allow(journey).to receive(:complete?).and_return false
+      oystercard.top_up(10)
+      oystercard.touch_in(entry_station)
+      expect(oystercard.fare).to eq Oystercard::PENALTY_FARE
+    end
+  end
+
+  describe '#double_touch_in' do
+    it 'deducts Penalty charge on double touch in' do
+      allow(journey).to receive(:complete?).and_return false
+      oystercard.top_up(10)
+      oystercard.touch_in(entry_station)
+      expect{oystercard.touch_in(entry_station)}.to change{ oystercard.balance }.by -Oystercard::PENALTY_FARE
+    end
+
+    it 'deducts penalty charge on double touch out' do
+      allow(journey).to receive(:complete?).and_return false
+      oystercard.top_up(10)
+      oystercard.touch_in(entry_station)
+      oystercard.touch_out(exit_station)
+      expect{oystercard.touch_out(exit_station)}.to change{ oystercard.balance }.by -Oystercard::PENALTY_FARE
+    end
+  end
+
 end
-
-=begin
-  context "journey history" do
-    before(:each) do
-      card.top_up(10)
-    end
-    it "starts with empty history" do
-      expect(card.history).to be_empty
-    end
-
-    it "records journey in hash" do
-      card.touch_in(start_station)
-      card.touch_out(end_station)
-      expect(card.journey).to include(start: start_station, end: end_station)
-    end
-
-    it "record history array upon touch out" do
-      card.touch_in(start_station)
-      card.touch_out(end_station)
-      expect(card.history).to include card.journey
-    end
-  end
-=end
-
-
-=begin
-    it "is in journey after touching in" do
-      card2.touch_in(start_station)
-      expect(card2).to be_in_journey
-    end
-    it "is no longer in journey after touching out" do
-      card2.touch_in(start_station)
-      card2.touch_out(end_station)
-      expect(card2).to_not be_in_journey
-    end
-
-    it "remembers touch out station" do
-      card.touch_in(start_station)
-      card.touch_out(end_station)
-      expect(card.exit_station).to eq end_station
-    end
-    it "remembers touch in station" do
-      card.touch_in(start_station)
-      expect(card.entry_station).to eq start_station
-    end
-    it "entry station cleared at touch out" do
-      card.touch_in(start_station)
-      card.touch_out(end_station)
-      expect(card.entry_station).to eq nil
-    end
-=end
