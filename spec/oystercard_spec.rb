@@ -1,107 +1,97 @@
 require 'oystercard'
 
 describe Oystercard do
-  subject(:oystercard) {described_class.new(journey)}
-  let(:entry_station) {double (:entry_station)}
-  let(:exit_station) {double (:exit_station)}
-  let(:journey) { double(:journey, :start => nil, :end => nil, :in_journey? => true, :complete? => true, :reset => nil) }
 
-  describe "#balance" do
-    it "is initialised with a balance of 0 by default" do
-      expect(oystercard.balance).to eq 0
+  subject(:card) { described_class.new(journey_log_class: journey_log_class) }
+  let(:journey_log) {double(:journey_log, :starts => nil, :ends => nil, :log => {})}
+  let(:station) { double (:station) }
+  let(:journey_log_class) { double(:journey_log_class, new: journey_log) }
+
+  it "new card balance == 0" do
+		  expect(card.balance).to eq 0
+  end
+
+  describe "top_up" do
+    it "topping up balance" do
+      expect{card.top_up(10)}.to change{card.balance}.by 10
+    end
+
+    it "raises error if over limit" do
+    	expect{card.top_up(Oystercard::TOP_UP_LIMIT + 1)}.to raise_error "Exceeds £#{Oystercard::TOP_UP_LIMIT} top up limit."
     end
   end
 
-  describe '#top_up' do
-    it 'adds the value specified to the balance' do
-      value = rand(Oystercard::BALANCE_MAX)
-      expect{oystercard.top_up(value)}.to change{ oystercard.balance }.from(0).to(value)
+  describe "touch_in" do
+
+    it "raises error if under minimum amount" do
+      card.top_up(Oystercard::MIN_FARE/2)
+      expect{card.touch_in(station)}.to raise_error 'Insufficient funds'
     end
+
+    it "starts a journey" do
+      card.top_up(Oystercard::TOP_UP_LIMIT)
+      expect(journey_log).to receive(:starts)
+      card.touch_in(station)
+    end
+
+    it "raises error if touched in twice in a row" do
+      card.top_up(Oystercard::TOP_UP_LIMIT)
+      card.touch_in(station)
+      expect {card.touch_in(station)}.to change{card.balance}.by(-Oystercard::PENALTY_FARE)
+	  end
   end
 
-  describe '#top_up' do
-    it 'raises an error if topping up more than the max limit' do
-      max_balance = Oystercard::BALANCE_MAX
-      oystercard.top_up(max_balance)
-      expect{ oystercard.top_up(1) }.to raise_error "Top-up exceeds maximum limit of #{max_balance}"
-    end
-  end
+  describe "touch_out" do
 
-  describe '#inferior_balance' do
-    it 'raises an exception if the balance is inferior to £1' do
-      expect{ oystercard.touch_in(entry_station) }.to raise_error 'Please top up your card.'
-    end
-  end
-
-  describe '#touch_in(station)' do
-    before(:each) do
-      oystercard.top_up(10)
+    before do
+      card.top_up(Oystercard::TOP_UP_LIMIT)
     end
 
-    it 'starts journey when card is touched in (Manzano style)' do
-      expect(journey).to receive(:start)
-      oystercard.touch_in(entry_station)
+    it 'charges penalty fare when failure to touch in' do
+      expect{card.touch_out(station)}.to change{card.balance}.by(-Oystercard::PENALTY_FARE)
     end
 
-    it 'is in in_journey when the card is touched in' do
-      oystercard.touch_in(entry_station)
-      expect(journey).to be_in_journey
-    end
-  end
-
-  describe '#touch_out' do
-
-    before(:each) do
-      oystercard.top_up(10)
-      oystercard.touch_in(entry_station)
+    it "ends a journey" do
+      card.touch_in(station)
+      expect(journey_log).to receive(:ends)
+      card.touch_out(station)
     end
 
-    it 'reduces the balance by the minimum fare' do
-      expect{oystercard.touch_out(exit_station)}.to change { oystercard.balance }.by -Oystercard::FARE_MIN
+    it "deducts #{Oystercard::MIN_FARE} from balance" do
+      card.touch_in(station)
+      expect{card.touch_out(station)}.to change{card.balance}.by(-Oystercard::MIN_FARE)
     end
 
-    it 'ends journey when card is touched out (Manzano style)' do
-      expect(journey).to receive(:end)
-      oystercard.touch_out(exit_station)
-    end
+    context "edge cases after legal journey" do
 
-    it 'is in not in_journey when the card is touched out' do
-      oystercard.touch_out(exit_station)
-      expect(journey).to be_complete
-    end
-  end
+      before do
+        card.touch_in(station)
+        card.touch_out(station)
+      end
 
-  describe '#fare' do
-    it 'returns the minimum fare when a journey is complete' do
-      oystercard.top_up(10)
-      oystercard.touch_in(entry_station)
-      oystercard.touch_out(exit_station)
-      expect(oystercard.fare).to eq Oystercard::FARE_MIN
-    end
+      it "charges penalty fare if no touch in after legal journey" do
+        expect{card.touch_out(station)}.to change{card.balance}.by(-Oystercard::PENALTY_FARE)
+      end
 
-    it 'returns the penalty fare when a journey is incomplete' do
-      allow(journey).to receive(:complete?).and_return false
-      oystercard.top_up(10)
-      oystercard.touch_in(entry_station)
-      expect(oystercard.fare).to eq Oystercard::PENALTY_FARE
-    end
-  end
+      it "creates a new journey for no touch in" do
+        card.touch_out(station)
+        expect(journey_log.log).not_to have_value(station)
+      end
 
-  describe '#double_touch_in' do
-    it 'deducts Penalty charge on double touch in' do
-      allow(journey).to receive(:complete?).and_return false
-      oystercard.top_up(10)
-      oystercard.touch_in(entry_station)
-      expect{oystercard.touch_in(entry_station)}.to change{ oystercard.balance }.by -Oystercard::PENALTY_FARE
     end
-
-    it 'deducts penalty charge on double touch out' do
-      allow(journey).to receive(:complete?).and_return false
-      oystercard.top_up(10)
-      oystercard.touch_in(entry_station)
-      oystercard.touch_out(exit_station)
-      expect{oystercard.touch_out(exit_station)}.to change{ oystercard.balance }.by -Oystercard::PENALTY_FARE
-    end
-  end
-
+	end
 end
+
+  # describe "history" do
+
+	 #    it "has empty history" do
+	 #    	expect(card.journeys).to be_empty
+	 #    end
+
+	 #    it "contains entry and exit station" do
+	 #    	card.top_up(Oystercard::TOP_UP_LIMIT)
+	 #      card.touch_in(station)
+	 #      card.touch_out(station)
+	 #    	expect(card.journeys).to include journey
+	 #    end
+  # end

@@ -1,36 +1,28 @@
-require_relative 'station'
-require_relative 'oystercard'
-
 class Journey
+	attr_reader :log
 
-attr_reader :entry_station, :exit_station, :journey_list
+	def initialize
+		@log = {}
+	end
 
-def initialize
-  @entry_station = nil
-  @exit_station = nil
-  @journey_list = {}
-end
-
-  def in_journey?
-    !!@entry_station
+  def in_progress?
+  	@log.has_key?(:entry_station) && !@log.has_key?(:exit_station)
   end
 
-  def start(entry_station)
-    @entry_station = entry_station
+  def starts(station)
+  	@log[:entry_station] = station
   end
 
-  def end(exit_station)
-    @journey_list[@entry_station] = exit_station
-    @exit_station = exit_station
+  def ends(station)
+  	@log[:exit_station] = station
+  end
+
+  def counts_zones #<-----test entire function
+  ((@log[:entry_station]).zone - (@log[:exit_station]).zone).abs
   end
 
   def complete?
-    !!@entry_station && !!@exit_station
-  end
-
-  def reset
-    @entry_station = nil
-    @exit_station = nil
+  	@log.has_key?(:entry_station) && @log.has_key?(:exit_station)
   end
 
 end
