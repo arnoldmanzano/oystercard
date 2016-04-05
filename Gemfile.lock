@@ -6,7 +6,11 @@ GEM
       rspec-core (~> 3.4.0)
       rspec-expectations (~> 3.4.0)
       rspec-mocks (~> 3.4.0)
+<<<<<<< HEAD
     rspec-core (3.4.1)
+=======
+    rspec-core (3.4.4)
+>>>>>>> master
       rspec-support (~> 3.4.0)
     rspec-expectations (3.4.0)
       diff-lcs (>= 1.2.0, < 2.0)
