@@ -44,9 +44,9 @@ describe Oystercard do
       allow(journey_log).to receive(:fare){Journey::PENALTY_FARE}
       allow(journey_log).to receive(:in_progress?){false}
       oystercard.top_up 10
-      subject.touch_in(entry_station)
+      oystercard.touch_in(entry_station)
       allow(journey_log).to receive(:in_progress?){true}
-      expect{subject.touch_in(entry_station)}.to change{subject.balance}.by -(Journey::PENALTY_FARE)
+      expect{oystercard.touch_in(entry_station)}.to change{oystercard.balance}.by -(Journey::PENALTY_FARE)
     end
 
     it 'raises an error if balance is less than 1' do
@@ -59,9 +59,6 @@ describe Oystercard do
       expect(journey_log).to receive(:start_journey)
       oystercard.touch_in(entry_station)
     end
-
-    # it '' do
-    # end
   end
 
   describe '#touch_out' do
@@ -75,7 +72,5 @@ describe Oystercard do
       expect(journey_log).to receive(:exit_journey)
       oystercard.touch_out(exit_station)
     end
-
   end
-
 end
